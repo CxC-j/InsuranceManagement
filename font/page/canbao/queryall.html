@@ -1,0 +1,221 @@
+<div class="layuimini-container layuimini-page-anim">
+    <div class="layuimini-main">
+
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">参保人姓名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="name" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-inline">
+                            <label class="layui-form-label">身份证号</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="idCard" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">参保状态</label>
+                            <div class="layui-input-block">
+                                <select name="status" lay-search="">
+                                    <option value="">直接选择</option>
+                                    <option value="正常参保">正常参保</option>
+                                    <option value="终止参保">终止参保</option>
+                                    <option value="濒临截止">濒临截止</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="submit" class="layui-btn layui-btn-primary" lay-submit
+                                    lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+        <script type="text/html" id="currentTableBar">
+            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">发送短信</a>
+
+        </script>
+    </div>
+</div>
+
+<script>
+    layui.use(['form', 'table', 'miniPage', 'element', 'miniAdmin', 'form', 'laydate'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table,
+            miniPage = layui.miniPage,
+            form = layui.form,
+            miniAdmin = layui.miniAdmin;
+
+        table.render({
+            elem: '#currentTableId',
+            method: 'post',
+            url: 'canbao/queryAll',
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports', 'print'],
+            cols: [[
+                {type: "checkbox", width: 50},
+                {field: 'id', width: 80, title: 'ID'},
+                {field: 'name', width: 80, title: '用户名'},
+                {field: 'sex', width: 80, title: '性别'},
+                {field: 'birthday', width: 80, title: '生日'},
+                {field: 'idCard', title: '身份证', minWidth: 100},
+                {field: 'phone1', title: '电话号', minWidth: 100},
+                {field: 'phone2', title: '备用电话号', minWidth: 100},
+                {field: 'nation', width: 80, title: '民族'},
+                {field: 'town', width: 80, title: '乡镇/区'},
+                {field: 'village', width: 80, title: '村/社区'},
+                {field: 'address', width: 135, title: '地址'},
+                {field: 'householdType', width: 135, title: '户籍性质'},
+                {field: 'category', width: 135, title: '险种'},
+                {field: 'status', width: 100, title: '参保状态'},
+                {field: 'createDateC', width: 100, title: '参保开始日期'},
+                {field: 'endDateC', width: 100, title: '参保终止日期'},
+                {field: 'createDateP', width: 100, title: '缴费开始日期'},
+                {field: 'endDateP', width: 100, title: '缴费截止日期'},
+                {field: 'endDateC', width: 150, title: '缴费终止日期'},
+                {field: 'grade', width: 135, title: '补缴等级'},
+                {field: 'back', width: 135, title: '补缴月数'},
+
+            ]],
+            limits: [10, 15, 20, 25, 50, 100],
+            limit: 10,
+            page: true,
+            skin: 'line'
+        });
+        form.render("select");
+        // table.on('tool(currentTableFilter)', function (obj) {
+        //     var data = obj.data;
+        //     if (obj.event === 'detail') {
+        //         console.log(data)
+        //         console.log(data)
+        //         console.log(data)
+        //         layer.msg('ID：' + data.id + ' 的查看操作');
+        //     }
+        // });
+
+        table.on('row(currentTableFilter)', function (obj) {
+            let content = miniPage.getHrefContent('canbao/show.html');
+            let openWH = miniPage.getOpenWidthHeight();
+            let index = layer.open({
+                title: '显示信息',
+                type: 1,
+                shade: 0.2,
+                maxmin: true,
+                shadeClose: true,
+                area: [openWH[0] + 'px', openWH[1] + 'px'],
+                offset: [openWH[2] + 'px', openWH[3] + 'px'],
+                content: content,
+            });
+            setFormvalue(obj.data);
+            $(window).on("resize", function () {
+                layer.full(index);
+            });
+            console.log(obj.data) //得到当前行数据
+            //obj.del(); //删除当前行
+            //obj.update(fields) //修改当前行数据
+        });
+
+        // 监听搜索操作
+        form.on('submit(data-search-btn)', function (data) {
+            var result = JSON.stringify(data.field);
+            //执行搜索重载
+            table.reload('currentTableId', {
+                page: {
+                    curr: 1
+                }
+                , where: data.field
+
+            }, 'data');
+
+            return false;
+        });
+
+        /**
+         * toolbar事件监听
+         */
+        // table.on('toolbar(currentTableFilter)', function (obj) {
+        //     if (obj.event === 'add') {   // 监听添加操作
+        //         let content = miniPage.getHrefContent('canbao/add.html');
+        //         let openWH = miniPage.getOpenWidthHeight();
+        //         let index = layer.open({
+        //             title: '添加用户',
+        //             type: 1,
+        //             shade: 0.2,
+        //             maxmin: true,
+        //             shadeClose: true,
+        //             area: [openWH[0] + 'px', openWH[1] + 'px'],
+        //             offset: [openWH[2] + 'px', openWH[3] + 'px'],
+        //             content: content,
+        //         });
+        //         $(window).on("resize", function () {
+        //             layer.full(index);
+        //         });
+        //     } else if (obj.event === 'update') {  // 监听修改操作
+        //         let data = table.checkStatus('currentTableId').data ;
+        //         if(data.length != 1){
+        //             miniAdmin.error("请选择一条修改记录");
+        //         }else {
+        //             let content = miniPage.getHrefContent('canbao/update.html');
+        //             let openWH = miniPage.getOpenWidthHeight();
+        //             let index = layer.open({
+        //                 title: '修改用户',
+        //                 type: 1,
+        //                 shade: 0.2,
+        //                 maxmin: true,
+        //                 shadeClose: true,
+        //                 area: [openWH[0] + 'px', openWH[1] + 'px'],
+        //                 offset: [openWH[2] + 'px', openWH[3] + 'px'],
+        //                 content: content,
+        //             });
+        //             setFormvalue(data[0]);
+        //             $(window).on("resize", function () {
+        //                 layer.full(index);
+        //             });
+        //         }
+        //     }
+        // });
+        function setFormvalue(data) {
+            form.val('showForm', {
+                id: data.id,
+                name: data.name,
+                sex: data.sex,
+                birthday: data.birthday,
+                idCard: data.idCard,
+                nation: data.nation,
+                town: data.town,
+                phone1: data.phone1,
+                phone2: data.phone2,
+                village: data.village,
+                address: data.address,
+                householdType: data.householdType,
+                category: data.category,
+                status: data.status,
+                createDateC: data.createDateC,
+                endDateC: data.endDateC,
+                createDateP: data.createDateP,
+                endDateP: data.endDateP,
+                grade: data.grade,
+                back: data.back,
+            })
+
+        }
+
+        window.reload = function () {
+            table.reload('currentTableId');
+        }
+
+
+    });
+</script>

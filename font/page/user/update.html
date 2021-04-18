@@ -1,0 +1,91 @@
+<div class="layuimini-main">
+    <div class="layui-form layuimini-form " lay-filter="updateForm">
+        <div class="layui-form-item">
+            <label class="layui-form-label required">用户名</label>
+            <div class="layui-input-block">
+                <input type="text" name="id" hidden="hidden">
+                <input type="text" name="userName" lay-verify="required" lay-reqtext="用户名不能为空" placeholder="请输入用户名" value="" class="layui-input">
+                <tip>填写自己管理账号的名称。</tip>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">密码</label>
+            <div class="layui-input-block">
+                <input type="password" name="password" lay-verify="required" lay-reqtext="密码不能为空" placeholder="请输入密码" value="" class="layui-input">
+                <tip>请输入密码</tip>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">姓名</label>
+            <div class="layui-input-block">
+                <input type="text" name="name" placeholder="请输入姓名" value="" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">手机</label>
+            <div class="layui-input-block">
+                <input type="number" name="phone" placeholder="请输入手机" value="" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">用户类型</label>
+            <div class="layui-input-block">
+                <select name="type" lay-verify="required">
+                    <option value="0">业务员</option>
+                    <option value="1">管理员</option>
+                </select>
+            </div>
+        </div>
+
+
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'table', 'laydate','axios','miniAdmin'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            $ = layui.$,
+            laydate = layui.laydate,
+            axios=layui.axios,
+            miniAdmin=layui.miniAdmin;
+        laydate.render({
+            elem: '#test1',
+            format: 'yyyy-MM-dd',
+        });
+        /**
+         * 初始化表单，要加上，不然刷新部分组件可能会不加载
+         */
+        form.render();
+
+        // 当前弹出层，防止ID被覆盖
+        var parentIndex = layer.index;
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            axios.post('user/update',data.field)
+                .then(function (response) {
+                    if(response.code==200){
+                        miniAdmin.success(response.msg);
+                        window.reload();
+                    }
+                    layer.close(parentIndex);
+                })
+                .catch(function (error) {
+                    miniAdmin.error(error);
+                })
+
+            return false;
+        });
+
+    });
+</script>

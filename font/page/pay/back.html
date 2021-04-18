@@ -1,0 +1,94 @@
+<div class="layuimini-main">
+    <div class="layui-form layuimini-form" lay-filter="updateForm" style="margin-top: 20px;">
+        <div class="layui-form-item">
+            <label class="layui-form-label required">姓名</label>
+            <div class="layui-input-block">
+                <input type="text" name="id" hidden="hidden">
+                <input type="text" name="name" lay-verify="required" disabled=“disabled”
+                       value="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">身份证号</label>
+            <div class="layui-input-block">
+                <input type="text" name="idCard" lay-verify="required" disabled=“disabled” lay-reqtext="身份证不能为空"
+                       placeholder="请输入身份证"
+                       value="" class="layui-input">
+
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">保险等级</label>
+            <div class="layui-input-block">
+                <select name="backGrade">
+                    <option value="" selected=""></option>
+                    <option value="一档">一档</option>
+                    <option value="二档">二档</option>
+                    <option value="三档">三档</option>
+                    <option value=四档">四档</option>
+                    <option value="五档">五档</option>
+                    <option value="六档">六档</option>
+                    <option value="七档">七档</option>
+                    <option value="八档">八档</option>
+                    <option value="九档">九档</option>
+                    <option value="十档">十档</option>
+                    <option value="十一档">十一档</option>
+                    <option value="十二档">十二档</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">补缴月数</label>
+            <div class="layui-input-block">
+                <input type="text" name="back" class="layui-input"  placeholder="月为单位">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block" style="text-align: center">
+                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认修改</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'table', 'laydate', 'axios', 'miniAdmin','miniPage'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            $ = layui.$,
+            laydate = layui.laydate,
+            axios = layui.axios,
+            miniAdmin = layui.miniAdmin,
+            miniPage=layui.miniPage;
+
+        /**
+         * 初始化表单，要加上，不然刷新部分组件可能会不加载
+         */
+        form.render();
+
+        // 当前弹出层，防止ID被覆盖
+        var parentIndex = layer.index;
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            axios.post('payment/back', data.field)
+                .then(function (response) {
+                    if (response.code == 200) {
+                        miniAdmin.success(response.msg);
+                        window.reload();
+                    }
+                    layer.close(parentIndex);
+                })
+                .catch(function (error) {
+                    miniAdmin.error(error);
+                })
+
+            return false;
+        });
+
+
+    });
+</script>

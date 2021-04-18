@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script src="https://how2j.cn/study/jquery.min.js"></script>
+
+<script >
+
+    $(function () {
+        $("#bt").click(function(){
+           console.log("我点点点")
+        });
+        $("#photo").one("error", function(e){
+            $(this).attr("src", "../images/加载.gif");
+        });
+    })
+
+</script>
+<style>
+    #photo{
+        width: 150px;
+        height: 150px;
+    }
+</style>
+<input type="image" id="photo" src=" ">
+<a href="javascript:;" id="bt">提交</a>
+</body>
+</html>

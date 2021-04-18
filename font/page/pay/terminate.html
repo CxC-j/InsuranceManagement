@@ -1,0 +1,194 @@
+<div class="layuimini-container layuimini-page-anim">
+    <div class="layuimini-main">
+
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">身份证号</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="idCard" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">搜索选择框</label>
+                            <div class="layui-input-block">
+                                <select name="grade" lay-verify="required" lay-search="">
+                                    <option value="">直接选择</option>
+                                    <option value="一档">一档</option>
+                                    <option value="二档">二档</option>
+                                    <option value="三档">三档</option>
+                                    <option value="四档">四档</option>
+                                    <option value="五档">五档</option>
+                                    <option value="六档">六档</option>
+                                    <option value="七档">七档</option>
+                                    <option value="八档">八档</option>
+                                    <option value="九档">九档</option>
+                                    <option value="十档">十档</option>
+                                    <option value="十一档">十一档</option>
+                                    <option value="十二档">十二档</option>
+
+                                </select>
+                            </div>
+                        </div>                        <div class="layui-inline">
+                        <button type="submit" class="layui-btn layui-btn-primary" lay-submit
+                                lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索
+                        </button>
+                    </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+        <script type="text/html" id="toolbarDemo">
+            <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add">
+                    <i class="layui-icon layui-icon-add-circle"></i>添加
+                </button>
+
+            </div>
+        </script>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+
+    </div>
+</div>
+
+<script>
+    layui.use(['form', 'table', 'miniPage', 'element','miniAdmin','form',], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table,
+            miniPage = layui.miniPage,
+            form = layui.form,
+            miniAdmin = layui.miniAdmin;
+        table.render({
+            elem: '#currentTableId',
+            method: 'post',
+            url: 'quit/query',
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports', 'print'],
+            cols: [[
+                {type: "checkbox", width: 50},
+                {field: 'id', width: 80, title: 'ID'},
+                {field: 'name', width: 80, title: '参保人姓名'},
+                {field: 'idCard', width: 80, title: '参保人身份证号'},
+                {field: 'receiverName', width: 80, title: '办理人姓名'},
+                {field: 'receiverCard', title: '办理人身份证', },
+                {field: 'accountNumber', width: 135, title: '银行账户'},
+                {field: 'reason', width: 135, title: '停止原因'},
+                {field: 'endDate', width: 135, title: '停止日期'},
+
+            ]],
+            limits: [10, 15, 20, 25, 50, 100],
+            limit: 10,
+            page: true,
+            skin: 'line'
+        });
+
+        form.render("select");
+        table.on('row(currentTableFilter)', function(obj){
+            let content = miniPage.getHrefContent('pay/update_t.html');
+            let openWH = miniPage.getOpenWidthHeight();
+            let index = layer.open({
+                title: '修改用户',
+                type: 1,
+                shade: 0.2,
+                maxmin: true,
+                shadeClose: true,
+                area: [openWH[0] + 'px', openWH[1] + 'px'],
+                offset: [openWH[2] + 'px', openWH[3] + 'px'],
+                content: content,
+            });
+            setFormvalue(obj.data);
+            $(window).on("resize", function () {
+                layer.full(index);
+            });
+            console.log(obj.data) //得到当前行数据
+            //obj.del(); //删除当前行
+            //obj.update(fields) //修改当前行数据
+        });
+        // 监听搜索操作
+        form.on('submit(data-search-btn)', function (data) {
+            var result = JSON.stringify(data.field);
+            //执行搜索重载
+            table.reload('currentTableId', {
+                page: {
+                    curr: 1
+                }
+                , where: data.field
+
+            }, 'data');
+
+            return false;
+        });
+
+        /**
+         * toolbar事件监听
+         */
+        table.on('toolbar(currentTableFilter)', function (obj) {
+            if (obj.event === 'add') {   // 监听添加操作
+                let content = miniPage.getHrefContent('pay/add_t.html');
+                let openWH = miniPage.getOpenWidthHeight();
+                let index = layer.open({
+                    title: '添加用户',
+                    type: 1,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: [openWH[0] + 'px', openWH[1] + 'px'],
+                    offset: [openWH[2] + 'px', openWH[3] + 'px'],
+                    content: content,
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+            } /*else if (obj.event === 'update') {  // 监听修改操作
+                let data = table.checkStatus('currentTableId').data ;
+                if(data.length != 1){
+                    layer.msg("请选择一条修改记录");
+                }else {
+                    let content = miniPage.getHrefContent('pay/update_t.html');
+                    let openWH = miniPage.getOpenWidthHeight();
+                    let index = layer.open({
+                        title: '修改用户',
+                        type: 1,
+                        shade: 0.2,
+                        maxmin: true,
+                        shadeClose: true,
+                        area: [openWH[0] + 'px', openWH[1] + 'px'],
+                        offset: [openWH[2] + 'px', openWH[3] + 'px'],
+                        content: content,
+                    });
+                    setFormvalue(data[0]);
+                    $(window).on("resize", function () {
+                        layer.full(index);
+                    });
+                }
+            }*/
+        });
+        function setFormvalue(data){
+            form.val('updateForm',{
+                id:data.id,
+                idCard:data.idCard,
+                name:data.name,
+                endDate:data.endDate,
+                receiverName:data.receiverName,
+                receiverCard:data.receiverCard,
+                accountNumber:data.accountNumber,
+                reason:data.reason,
+
+            })
+
+        }
+        window.reload=function (){
+            table.reload('currentTableId');
+        }
+
+
+
+    });
+</script>

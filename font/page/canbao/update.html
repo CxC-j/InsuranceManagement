@@ -1,0 +1,195 @@
+<style>
+    #pic {
+        width: 150px;
+        height: 150px;
+    }
+</style>
+<div class="layuimini-main">
+    <div class="layui-form layuimini-form" lay-filter="updateForm" style="margin-top: 20px;">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">用户名</label>
+            <div class="layui-input-block">
+                <input type="text" name="id" hidden="hidden">
+                <input type="text" name="name" lay-verify="required" lay-reqtext="用户名不能为空" placeholder="请输入用户名"
+                       value="" class="layui-input">
+
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">身份证号</label>
+            <div class="layui-input-block">
+                <input type="text" name="idCard" id="idCard" lay-verify="required" lay-reqtext="身份证号不能为空" placeholder="请输入身份证号"
+                       value="" class="layui-input">
+                <tip>修改身份证后请重新拍照</tip>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">性别</label>
+            <div class="layui-input-block">
+                <input type="radio" name="sex" value="男" title="男" checked="checked">
+                <input type="radio" name="sex" value="女" title="女">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">生日</label>
+            <div class="layui-input-block">
+                <input type="text" name="birthday" class="layui-input" id="test1" placeholder="yyyy-MM-dd">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">户籍性质</label>
+            <div class="layui-input-block">
+                <select name="householdType">
+                    <option value=""></option>
+                    <option value="家庭户籍" selected="">家庭户籍</option>
+                    <option value="集体户籍">集体户籍</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">照片</label>
+            <div class="layui-input-block">
+                <input type="image" id="pic" src="">
+                <button type="button" class="layui-btn" id="photo">拍照</button>
+                <button type="button" class="layui-btn layui-btn-normal" id="show">显示照片</button>
+
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">民族</label>
+            <div class="layui-input-block">
+                <input type="text" name="nation" lay-verify="required" lay-reqtext="民族不能为空" placeholder="请输入民族"
+                       value="" class="layui-input">
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">乡镇/区</label>
+            <div class="layui-input-block">
+                <input type="text" name="town" lay-verify="required" lay-reqtext="地区不能为空" placeholder="请输入地区"
+                       value="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">村/社区</label>
+            <div class="layui-input-block">
+                <input type="text" name="village" lay-verify="required" lay-reqtext="地区不能为空" placeholder="请输入地区"
+                       value="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">家庭地址</label>
+            <div class="layui-input-block">
+                <input type="text" name="address" lay-verify="required" lay-reqtext="地址不能为空" placeholder="请输入地址"
+                       value="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">电话号</label>
+            <div class="layui-input-block">
+                <input type="text" name="phone1" lay-verify="required" lay-reqtext="电话不能为空" placeholder="请输入电话"
+                       value="" class="layui-input">
+
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">备用电话号</label>
+            <div class="layui-input-block">
+                <input type="text" name="phone2" lay-verify="required" lay-reqtext="电话不能为空" placeholder="请输入电话"
+                       value="" class="layui-input">
+
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">保险种类</label>
+            <div class="layui-input-block">
+                <input type="text" name="category" lay-verify="required" lay-reqtext="险种不能为空" placeholder="请输入险种"
+                       value="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block" style="text-align: center">
+                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'table', 'laydate', 'axios', 'miniAdmin'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            $ = layui.$,
+            laydate = layui.laydate,
+            axios = layui.axios,
+            miniAdmin = layui.miniAdmin;
+        laydate.render({
+            elem: '#test1',
+            format: 'yyyy-MM-dd',
+        });
+        /**
+         * 初始化表单，要加上，不然刷新部分组件可能会不加载
+         */
+        form.render();
+
+        // 当前弹出层，防止ID被覆盖
+        var parentIndex = layer.index;
+
+        form.render();
+
+        $("#pic").one("error", function (e) {
+            $(this).attr("src", "../images/加载.gif");
+        });
+        $("#show").click(function () {
+            var idCard = $("#idCard").val();
+            $("#pic").attr("src", "../images/download/picture/" + idCard + ".jpg?t=" + Math.random());
+
+        })
+
+        $("#photo").click(function () {
+            var idCard = $("#idCard").val();
+            console.log(idCard);
+            axios.get('photo/tp', {
+                params: {
+                    idCard: idCard
+                }
+            })
+                .then(function (response) {
+                    if (response.code == 200) {
+                        $("#pic").attr("src", "../images/download/picture/" + idCard + ".jpg?t=" + Math.random());
+                        miniAdmin.success(response.msg);
+                        form.render();
+                    }
+                    layer.close(parentIndex);
+
+                })
+                .catch(function (error) {
+                    miniAdmin.error(error);
+                })
+
+
+        });
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            axios.post('canbao/update', data.field)
+                .then(function (response) {
+                    if (response.code == 200) {
+                        miniAdmin.success(response.msg);
+                        window.reload();
+                    }
+                    layer.close(parentIndex);
+
+                })
+                .catch(function (error) {
+                    miniAdmin.error(error);
+                })
+
+            return false;
+        });
+
+    });
+</script>

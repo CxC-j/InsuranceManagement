@@ -1,0 +1,62 @@
+<div class="layuimini-main">
+    <div class="layui-form layuimini-form" lay-filter="updateForm">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">标题</label>
+            <div class="layui-input-block">
+                <input type="hidden" name="id" id="id">
+                <input type="text" name="title" id="title" lay-verify="required" lay-reqtext="标题不能为空" autocomplete="off"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">内容</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入内容" name="content" id="content" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item" >
+            <div class="layui-input-block" style="text-align: center">
+                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'table', 'laydate', 'axios', 'miniAdmin'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            $ = layui.$,
+            axios = layui.axios,
+            miniAdmin = layui.miniAdmin;
+
+        /**
+         * 初始化表单，要加上，不然刷新部分组件可能会不加载
+         */
+        form.render();
+
+        // 当前弹出层，防止ID被覆盖
+        var parentIndex = layer.index;
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            axios.post('notice/update', data.field)
+                .then(function (response) {
+                    if (response.code == 200) {
+                        miniAdmin.success(response.msg);
+                        window.reload();
+                    }
+                    layer.close(parentIndex);
+                })
+                .catch(function (error) {
+                    miniAdmin.error(error);
+                })
+
+            return false;
+        });
+
+    });
+</script>

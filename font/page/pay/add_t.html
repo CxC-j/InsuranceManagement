@@ -1,0 +1,91 @@
+<div class="layuimini-main">
+    <div class="layui-form layuimini-form" style="margin-top: 20px;">
+        <div class="layui-form-item">
+            <label class="layui-form-label required">参保人身份证号</label>
+            <div class="layui-input-block">
+                <input type="text" name="idCard" lay-verify="required" autocomplete="off" lay-reqtext="身份证不能为空" placeholder="请输入身份证"
+                       value="" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">办理人姓名</label>
+            <div class="layui-input-block">
+                <input type="text" name="receiverName" lay-verify="required" autocomplete="off" lay-reqtext="姓名不能为空" placeholder="请输入姓名"
+                       value="" class="layui-input">
+
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">办理人身份证号</label>
+            <div class="layui-input-block">
+                <input type="text" name="receiverCard" lay-verify="required" autocomplete="off" lay-reqtext="身份证不能为空" placeholder="请输入身份证"
+                       value="" class="layui-input">
+
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">银行账户</label>
+            <div class="layui-input-block">
+                <input type="text" name="accountNumber" lay-verify="required" autocomplete="off" lay-reqtext="账户不能为空" placeholder="请输入账户"
+                       value="" class="layui-input">
+
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">停止原因</label>
+            <div class="layui-input-block">
+                <input type="text" name="reason" lay-verify="required" autocomplete="off" lay-reqtext="原因不能为空" placeholder="请输入原因"
+                       value="" class="layui-input">
+
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <div class="layui-input-block" style="text-align: center">
+                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'table', 'laydate', 'axios', 'miniAdmin'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            $ = layui.$,
+            laydate = layui.laydate,
+            axios = layui.axios,
+            miniAdmin = layui.miniAdmin;
+        laydate.render({
+            elem: '#test1',
+            format: 'yyyy-MM-dd',
+        });
+        /**
+         * 初始化表单，要加上，不然刷新部分组件可能会不加载
+         */
+        form.render();
+
+        // 当前弹出层，防止ID被覆盖
+        var parentIndex = layer.index;
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            axios.post('quit/create', data.field)
+                .then(function (response) {
+                    if (response.code == 200) {
+                        miniAdmin.success(response.msg);
+                        window.reload();
+                    }
+                    layer.close(parentIndex);
+                })
+                .catch(function (error) {
+                    miniAdmin.error(error);
+                })
+
+            return false;
+        });
+
+    });
+</script>

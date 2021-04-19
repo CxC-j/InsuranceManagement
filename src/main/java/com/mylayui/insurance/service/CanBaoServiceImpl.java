@@ -31,10 +31,10 @@ public class CanBaoServiceImpl implements CanBaoService {
         Page<CanBao> canBaoPage = new Page<>(canBao.getPage(), canBao.getLimit());
         QueryWrapper queryWrapper = new QueryWrapper();
         if (!(canBao.getName() == null || canBao.getName().isEmpty())) {
-            queryWrapper.eq("name", canBao.getName());
+            queryWrapper.like("name", canBao.getName());
         }
         if (!(canBao.getIdCard() == null || canBao.getIdCard().isEmpty())) {
-            queryWrapper.eq("id_card", canBao.getIdCard());
+            queryWrapper.like("id_card", canBao.getIdCard());
         }
         Page<CanBao> result = canBaoMapper.selectPage(canBaoPage, queryWrapper);
         return result;
@@ -71,10 +71,10 @@ public class CanBaoServiceImpl implements CanBaoService {
         Date needDate;
         int total = 0;
         if (!(canBaoVO.getName() == null || canBaoVO.getName().isEmpty())) {
-            queryWrapper.eq("name", canBaoVO.getName());
+            queryWrapper.like("name", canBaoVO.getName());
         }
         if (!(canBaoVO.getIdCard() == null || canBaoVO.getIdCard().isEmpty())) {
-            queryWrapper.eq("id_card", canBaoVO.getIdCard());
+            queryWrapper.like("id_card", canBaoVO.getIdCard());
         }
         queryWrapper.orderByAsc("id_card");
         if (!StringUtils.isEmpty(canBaoVO.getStatus())) {
